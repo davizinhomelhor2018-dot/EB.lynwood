@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comando Militar — Gestão de Efetivo & Atividades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050505;--bg2:#0d0d0d;--bg3:#151515;--panel:rgba(14,14,14,.96);--border:rgba(242,217,78,.12);--border-focus:#f2d94e;--accent:#f2d94e;--accent-glow:rgba(242,217,78,.25);--gold:#f2d94e;--green:#00f070;--red:#f03030;--text:#ececec;--text-muted:#8a8a80;--r:8px;--font-display:'Rajdhani',sans-serif;--font-mono:'JetBrains Mono',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(242,217,78,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(242,217,78,.02) 1px,transparent 1px);background-size:40px 40px}
+.top-navbar{position:sticky;top:0;z-index:200;background:rgba(5,5,5,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;height:56px;gap:1rem}
+.brand-title{display:flex;align-items:center;gap:.6rem;font-family:var(--font-display);font-weight:800;font-size:1.15rem;letter-spacing:.14em;color:#fff;text-transform:uppercase;white-space:nowrap}
+.brand-title span{color:var(--gold)}
+.nav-links{display:flex;align-items:center;gap:.2rem;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-btn{background:none;border:1px solid transparent;color:var(--text-muted);font-family:var(--font-display);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.4rem .75rem;border-radius:var(--r);cursor:pointer;transition:.15s;white-space:nowrap}
+.nav-btn:hover{color:var(--text);background:rgba(242,217,78,.05)}
+.nav-btn.active{color:var(--accent);border-color:var(--border);background:rgba(242,217,78,.1)}
+.top-right{display:flex;align-items:center;gap:.8rem}
+.unit-select{background:var(--bg2);border:1px solid var(--border);color:var(--accent);padding:.35rem .65rem;border-radius:var(--r);font-family:var(--font-display);font-size:.8rem;font-weight:700;outline:none;cursor:pointer}
+.main-content{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:1.5rem 1rem}
+.view-section{display:none}.view-section.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.panel-head{padding:.85rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(242,217,78,.03);flex-wrap:wrap;gap:.5rem}
+.panel-title{font-family:var(--font-display);font-size:.95rem;font-weight:800;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.5rem .9rem;border-radius:var(--r);font-family:var(--font-display);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--border);background:var(--bg3);color:var(--text);cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--accent);color:#fff;background:rgba(242,217,78,.12)}
+.btn-primary{background:linear-gradient(135deg,#b8941f,#f2d94e);border:none;color:#1a1400;font-weight:900}
+.btn-primary:hover{filter:brightness(1.15);box-shadow:0 0 15px var(--accent-glow)}
+.btn-gold{background:rgba(255,194,51,.15);border-color:rgba(255,194,51,.4);color:var(--gold)}
+.btn-danger{background:rgba(240,48,48,.15);border-color:rgba(240,48,48,.4);color:#ff6666}
+.btn-sm{padding:.3rem .6rem;font-size:.7rem}
+.table-wrap{overflow-x:auto;width:100%}
+.table{width:100%;border-collapse:collapse;font-size:.82rem}
+.table th{padding:.75rem 1rem;text-align:left;font-family:var(--font-display);font-size:.72rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);background:rgba(0,0,0,.25)}
+.table td{padding:.7rem 1rem;border-bottom:1px solid rgba(242,217,78,.05);vertical-align:middle;color:var(--text)}
+.table tbody tr:hover td{background:rgba(242,217,78,.04)}
+.badge-status{display:inline-block;padding:.2rem .6rem;border-radius:4px;font-family:var(--font-display);font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.st-ativo{background:rgba(0,240,112,.12);border:1px solid rgba(0,240,112,.4);color:var(--green)}
+.st-ferias{background:rgba(255,194,51,.12);border:1px solid rgba(255,194,51,.4);color:var(--gold)}
+.st-licenca{background:rgba(242,217,78,.12);border:1px solid rgba(242,217,78,.4);color:var(--accent)}
+.st-mia{background:rgba(240,48,48,.18);border:1px solid rgba(240,48,48,.5);color:#ff5555}
+.toolbar-filter{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
+.input-militar{background:var(--bg2);border:1px solid var(--border);color:var(--text);padding:.5rem .8rem;border-radius:var(--r);font-size:.82rem;outline:none;font-family:inherit}
+.input-militar:focus{border-color:var(--border-focus);box-shadow:0 0 10px var(--accent-glow)}
+.action-dropdown{position:relative;display:inline-block}
+.dropdown-menu{display:none;position:absolute;right:0;top:100%;z-index:300;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);width:185px;box-shadow:0 12px 30px rgba(0,0,0,.8);padding:.3rem 0;text-align:left}
+.action-dropdown.open .dropdown-menu{display:block}
+.dropdown-item{width:100%;text-align:left;padding:.5rem .9rem;font-size:.74rem;font-family:var(--font-display);font-weight:700;letter-spacing:.05em;background:none;border:none;color:var(--text);cursor:pointer;display:block}
+.dropdown-item:hover{background:rgba(242,217,78,.12);color:var(--accent)}
+.dropdown-item.danger:hover{background:rgba(240,48,48,.15);color:#ff6666}
+.grade-table th{text-align:center}.grade-table td{text-align:center}
+.grade-btn{width:42px;height:34px;border-radius:4px;border:1px solid var(--border);background:var(--bg3);color:var(--text-muted);font-weight:800;cursor:pointer}
+.grade-btn.P{background:rgba(0,240,112,.18);border-color:var(--green);color:var(--green)}
+.grade-btn.F{background:rgba(240,48,48,.18);border-color:var(--red);color:#ff6666}
+.grade-btn.J{background:rgba(255,194,51,.18);border-color:var(--gold);color:var(--gold)}
+.grade-btn.N{background:rgba(242,217,78,.18);border-color:var(--accent);color:var(--accent)}
+.modal-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal-card{background:linear-gradient(145deg,#121212,#050505);border:1px solid var(--border);border-radius:12px;width:min(560px,96vw);max-height:90vh;overflow-y:auto;padding:1.5rem;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.9)}
+.modal-close{position:absolute;top:.8rem;right:.8rem;background:none;border:none;color:var(--text-muted);font-size:1.3rem;cursor:pointer;min-width:40px;min-height:40px}
+.f{margin-bottom:.9rem}.f label{display:block;font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.35rem;font-family:var(--font-display)}
+.f input,.f select,.f textarea{width:100%}.f textarea{min-height:84px;resize:vertical}
+.chk-list{max-height:170px;overflow:auto;border:1px solid var(--border);border-radius:var(--r);padding:.4rem .6rem;margin-top:.4rem}
+.chk-list label{display:flex;align-items:center;gap:.5rem;padding:.35rem 0;font-size:.85rem;color:var(--text);text-transform:none;letter-spacing:0;font-family:inherit;font-weight:500;margin:0;cursor:pointer}
+.chk-list input{width:auto}
+.prev-imgs{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.4rem}.prev-imgs img{height:60px;border-radius:6px;border:1px solid var(--border)}
+.dos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin:.8rem 0}
+.dos-grid div{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:.5rem;font-size:.68rem;color:var(--text-muted)}
+.dos-grid b{display:block;font-family:var(--font-display);font-size:1.3rem;color:var(--text)}
+.dos-ev{display:flex;gap:.7rem;padding:.5rem 0 .5rem .8rem;border-left:2px solid var(--green);margin-bottom:.4rem}
+.dos-ev .d{font-family:var(--font-mono);font-size:.68rem;color:var(--green);min-width:72px}.dos-ev small{display:block;color:var(--text-muted);font-size:.75rem}
+#doc-view-overlay{position:fixed;inset:0;z-index:2000;background:#12151c;overflow-y:auto;padding:1.5rem;display:none}
+#doc-view-overlay.open{display:block}
+.paper-sheet{background:#fff;color:#111;max-width:800px;margin:0 auto;padding:48px 56px;font-family:'Times New Roman',serif;font-size:13px;line-height:1.6;box-shadow:0 10px 40px rgba(0,0,0,.8);position:relative}
+.paper-sheet h4{margin:1rem 0 .3rem;border-bottom:1px solid #999;font-size:13px}
+.paper-sheet table.meta{width:100%;border-collapse:collapse}.paper-sheet table.meta td{padding:.2rem .4rem;vertical-align:top}
+.paper-sheet table.lista{width:100%;border-collapse:collapse;font-size:11px}.paper-sheet table.lista th,.paper-sheet table.lista td{border:1px solid #999;padding:.25rem .4rem;text-align:left}
+.paper-sheet .annex{page-break-before:always}.paper-sheet .annex img{display:block;max-width:100%;margin:.6rem 0;border:1px solid #999}
+.doc-top{text-align:center;border-bottom:2px solid #222;padding-bottom:.6rem;margin-bottom:1.2rem}
+.doc-title{text-align:center;text-decoration:underline;font-weight:700;margin:1rem 0;font-size:15px}
+.doc-stamp-red{position:absolute;right:45px;bottom:150px;border:2.5px solid #b81414;color:#b81414;padding:.3rem .6rem;font-size:10px;font-weight:800;transform:rotate(-7deg);text-transform:uppercase;text-align:center;line-height:1.3}
+.doc-signature-box{margin-top:3.5rem;text-align:center;position:relative;min-height:100px}
+.doc-sign-hand{font-family:'Brush Script MT','Segoe Script',cursive;font-size:32px;color:#111}
+.doc-sign-role{display:inline-block;border-top:1px solid #111;padding-top:.2rem;min-width:240px;font-size:11px;font-weight:700}
+#toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#151515;border:1px solid var(--accent);color:#fff;padding:.6rem 1rem;border-radius:var(--r);z-index:3000;font-size:.82rem;display:none}
+@media print{body>*:not(#doc-view-overlay){display:none!important}#doc-view-overlay{padding:0!important;background:#fff!important;position:static!important}.paper-sheet{box-shadow:none!important;max-width:100%!important;padding:0!important}.no-print{display:none!important}}
+
+/* ── CELULAR (em pé e deitado) ── */
+@media(max-width:800px),(max-height:520px){
+  .top-navbar{flex-wrap:wrap;height:auto;padding:.5rem .8rem;gap:.4rem}
+  .brand-title{font-size:.95rem;letter-spacing:.08em}
+  .top-right{margin-left:auto}
+  .nav-links{order:3;width:100%;padding-bottom:.2rem}
+  .nav-btn{min-height:44px;font-size:.85rem;padding:.5rem .9rem}
+  .unit-select{min-height:40px}
+  .main-content{padding:1rem .6rem}
+  .toolbar-filter>*{flex:1 1 140px;min-height:44px}
+  .table thead{display:none}
+  .table,.table tbody{display:block;width:100%}
+  .table tr{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem .8rem;padding:.8rem .9rem;border-bottom:1px solid var(--border);position:relative}
+  .table td{display:block;padding:0!important;border:0!important;font-size:.82rem;color:var(--text-muted)}
+  .table td:first-child{width:100%;font-size:1rem;color:var(--text)}
+  #view-efetivo .table tr{padding-right:3.6rem}
+  #view-efetivo .table td:last-child{position:absolute;right:.3rem;top:.4rem}
+  #view-relatorios .table td:last-child,#view-oficios .table td:last-child{width:100%;display:flex;gap:.5rem;margin-top:.3rem;justify-content:stretch!important}
+  #view-relatorios .table td:last-child .btn,#view-oficios .table td:last-child .btn{flex:1;min-height:44px}
+  #view-efetivo .btn.btn-sm{min-width:46px;min-height:46px;font-size:1.3rem}
+  .dropdown-menu{position:fixed!important;left:0!important;right:0!important;top:auto!important;bottom:0!important;width:100%!important;max-height:80vh;overflow:auto;border-radius:16px 16px 0 0;padding:.5rem .5rem 1rem;display:none}
+  .action-dropdown.open .dropdown-menu{display:grid;grid-template-columns:1fr 1fr}
+  .dropdown-item{min-height:48px;font-size:.88rem}
+  .grade-btn{width:100%;min-width:44px;height:46px}
+  .paper-sheet{padding:22px 16px;font-size:12px}
+  .dos-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){.action-dropdown.open .dropdown-menu{grid-template-columns:1fr}}
+#login-overlay{position:fixed;inset:0;z-index:2500;background:radial-gradient(circle at 50% 30%,#14120a,#000 70%);display:none;align-items:center;justify-content:center;padding:1rem}
+.login-card{width:min(380px,94vw);background:linear-gradient(145deg,#121212,#050505);border:1px solid var(--accent);border-radius:12px;padding:1.8rem 1.6rem;box-shadow:0 0 40px rgba(242,217,78,.12)}
+.login-card h1{font-family:var(--font-display);font-size:1.5rem;letter-spacing:.12em;color:var(--accent);text-align:center;text-transform:uppercase}
+.login-card .sub{text-align:center;font-size:.62rem;font-weight:800;letter-spacing:.14em;color:#fff;text-transform:uppercase;margin:.3rem 0 1.4rem}
+.login-card .input-militar{width:100%;min-height:44px}
+.btn-login{width:100%;min-height:46px;margin-top:.4rem;background:#1f6b2e;border:1px solid #2f9a44;color:#fff;font-family:var(--font-display);font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:var(--r);cursor:pointer}
+.btn-login:hover{filter:brightness(1.2)}
+</style>
+</head>
+<body>
+
+<header class="top-navbar">
+  <div class="brand-title">EXÉRCITO <span>★</span> <span id="nav-unit-label">YUBA</span></div>
+  <nav class="nav-links"><button class="nav-btn active" data-v="dashboard" onclick="navTo('dashboard')">Dashboard</button><button class="nav-btn" data-v="efetivo" onclick="navTo('efetivo')">Efetivo</button><button class="nav-btn" data-v="grade" onclick="navTo('grade')">Presença</button><button class="nav-btn" data-v="relatorios" onclick="navTo('relatorios')">Relatórios</button><button class="nav-btn" data-v="oficios" onclick="navTo('oficios')">Ofícios</button><button class="nav-btn" data-v="usuarios" onclick="navTo('usuarios')">Usuários</button><button class="nav-btn" data-v="log" onclick="navTo('log')">Log</button><button class="nav-btn" data-v="setores" onclick="navTo('setores')">Setores</button><button class="nav-btn" style="color:var(--red)" onclick="sair()">Sair</button></nav>
+  <div class="top-right">
+    <select id="setor-select" class="unit-select" onchange="trocarSetor(this.value)">
+      <option value="SETOR_SUL">Setor Sul</option>
+      <option value="SETOR_NORTE">Setor Norte</option>
+      <option value="BPM1">1° B.P.M</option>
+      <option value="BOPE">B.O.P.E</option>
+      <option value="ROTA">R.O.T.A</option>
+    </select>
+  </div>
+</header>
+
+<main class="main-content">
+  <section id="view-dashboard" class="view-section active">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Painel de Comando e Resumo Semanal</span><span id="dash-info-date" style="font-size:.75rem;color:var(--text-muted)"></span></div>
+      <div style="padding:1.2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem">
+        <div style="background:var(--bg3);padding:1rem;border-radius:var(--r);border:1px solid var(--border)"><div style="font-size:.7rem;color:var(--text-muted)">TOTAL EFETIVO</div><div id="stat-total" style="font-size:1.8rem;font-weight:800;color:var(--accent)">0</div></div>
+        <div style="background:var(--bg3);padding:1rem;border-radius:var(--r);border:1px solid var(--border)"><div style="font-size:.7rem;color:var(--text-muted)">EM SERVIÇO (ATIVOS)</div><div id="stat-ativos" style="font-size:1.8rem;font-weight:800;color:var(--green)">0</div></div>
+        <div style="background:var(--bg3);padding:1rem;border-radius:var(--r);border:1px solid var(--border)"><div style="font-size:.7rem;color:var(--text-muted)">EM FÉRIAS</div><div id="stat-ferias" style="font-size:1.8rem;font-weight:800;color:var(--gold)">0</div></div>
+        <div style="background:var(--bg3);padding:1rem;border-radius:var(--r);border:1px solid var(--border)"><div style="font-size:.7rem;color:var(--text-muted)">ATIVIDADES (7 DIAS)</div><div id="stat-atividades" style="font-size:1.8rem;font-weight:800;color:#fff">0</div></div>
+      </div>
+    </div>
+    <div class="panel" style="border-color:rgba(242,217,78,.5)"><div class="panel-head"><span class="panel-title">Ação necessária: atualizar fardamento</span></div><div id="dash-acao" style="padding:.8rem 1.2rem;font-size:.85rem"></div></div>
+  </section>
+
+  <section id="view-efetivo" class="view-section">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Efetivo Militar</span><button class="btn btn-primary" onclick="abrirModalNovoMilitar()">+ NOVO MILITAR</button></div>
+      <div style="padding:.9rem 1.2rem">
+        <div class="toolbar-filter">
+          <input type="text" id="filtro-nome" class="input-militar" placeholder="Buscar nome..." oninput="filtrarTabelaEfetivo()">
+          <select id="filtro-status" class="input-militar" onchange="filtrarTabelaEfetivo()"><option value="">Todos os Status</option><option value="ATIVO">Ativo</option><option value="FERIAS">Férias</option><option value="LICENCA">Licença</option><option value="MIA">M.I.A</option></select>
+          <select id="filtro-patente" class="input-militar" onchange="filtrarTabelaEfetivo()"><option value="">Todas Patentes</option></select>
+          <button class="btn btn-sm" onclick="limparFiltrosEfetivo()">Limpar</button>
+        </div>
+        <div class="table-wrap"><table class="table"><thead><tr><th>Nome</th><th>Cargo / Patente</th><th>Função</th><th>Status</th><th>Setor</th><th style="text-align:right">Ações</th></tr></thead><tbody id="tbody-efetivo"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-relatorios" class="view-section">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Relatórios de Atividade</span><div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn btn-gold btn-sm" onclick="gerarConsolidado()">Relatório Consolidado</button><button class="btn btn-primary btn-sm" onclick="abrirNovoRelatorio()">+ Novo Relatório</button></div></div>
+      <div style="padding:.9rem 1.2rem"><div class="table-wrap"><table class="table"><thead><tr><th>Número</th><th>Data</th><th>Tipo</th><th>Título</th><th>Autor</th><th style="text-align:right">Ações</th></tr></thead><tbody id="tbody-relatorios"></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section id="view-oficios" class="view-section">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Ofícios e Memorandos</span><button class="btn btn-primary btn-sm" onclick="abrirNovoOficio()">+ Redigir Ofício</button></div>
+      <div style="padding:.9rem 1.2rem"><div class="table-wrap"><table class="table"><thead><tr><th>Número</th><th>Data</th><th>Tipo</th><th>Assunto</th><th>Militar Ref.</th><th style="text-align:right">Ações</th></tr></thead><tbody id="tbody-oficios"></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section id="view-grade" class="view-section">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Presença — Grade Semanal</span><div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn btn-sm" onclick="navTo('presenca')">📋 Lista Discord</button><button class="btn btn-gold btn-sm" onclick="abrirChamadaHorario()">Chamada por Horário</button></div></div>
+      <div style="padding:1rem">
+        <div class="toolbar-filter"><select id="grade-militar-select" class="input-militar" onchange="renderGradeSemanal()"></select><input type="date" id="grade-data" class="input-militar" onchange="renderGradeSemanal()"></div>
+        <div class="table-wrap" id="grade-box-container"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-presenca" class="view-section">
+    <div class="panel">
+      <div class="panel-head"><span class="panel-title">Lista de Presença Rápida (Discord)</span><button class="btn btn-primary btn-sm" onclick="copiarPresencaDiscord()">📋 Copiar Discord</button></div>
+      <div style="padding:1.2rem"><pre id="discord-preview-box" style="background:#000;border:1px solid var(--border);padding:1rem;border-radius:var(--r);font-family:var(--font-mono);font-size:.8rem;line-height:1.7;color:#cde;white-space:pre-wrap"></pre></div>
+    </div>
+  </section>
+<section id="view-usuarios" class="view-section"><div class="panel"><div class="panel-head"><span class="panel-title">Usuários do Sistema</span></div><div style="padding:.9rem 1.2rem"><div class="table-wrap"><table class="table"><thead><tr><th>Nome</th><th>Acesso</th><th>Setor</th></tr></thead><tbody id="tbody-usuarios"></tbody></table></div></div></div></section><section id="view-log" class="view-section"><div class="panel"><div class="panel-head"><span class="panel-title">Log de Eventos</span></div><div style="padding:.9rem 1.2rem"><div class="table-wrap"><table class="table"><thead><tr><th>Data</th><th>Militar</th><th>Evento</th><th>Detalhe</th><th>Autor</th></tr></thead><tbody id="tbody-log"></tbody></table></div></div></div></section><section id="view-setores" class="view-section"><div class="panel"><div class="panel-head"><span class="panel-title">Setores</span></div><div style="padding:.9rem 1.2rem"><div class="table-wrap"><table class="table"><thead><tr><th>Setor</th><th>Efetivo</th><th>Ativos</th><th>Relatórios</th></tr></thead><tbody id="tbody-setores"></tbody></table></div></div></div></section></main>
+
+<div id="modal-container" class="modal-overlay">
+  <div class="modal-card">
+    <button class="modal-close" onclick="fecharModal()">✕</button>
+    <h3 id="modal-title" style="font-family:var(--font-display);font-size:1.1rem;color:var(--accent);text-transform:uppercase;margin-bottom:1.2rem;padding-right:2rem"></h3>
+    <div id="modal-body"></div>
+    <div id="modal-footer" style="display:flex;justify-content:flex-end;gap:.6rem;margin-top:1.5rem;flex-wrap:wrap"></div>
+  </div>
+</div>
+
+<div id="doc-view-overlay">
+  <div class="no-print" style="display:flex;justify-content:center;gap:1rem;margin-bottom:1.2rem;flex-wrap:wrap">
+    <button class="btn btn-primary" onclick="window.print()">🖨 IMPRIMIR / SALVAR PDF OFICIAL</button>
+    <button class="btn" onclick="fecharDocViewer()">VOLTAR</button>
+  </div>
+  <div class="paper-sheet" id="doc-paper-content"></div>
+</div>
+<div id="login-overlay"><form class="login-card" onsubmit="return entrar(event)" autocomplete="off">
+<h1>EXÉRCITO ★ YUBA</h1><div class="sub">Sistema Integrado de Gestão Militar</div>
+<div class="f"><label>Usuário</label><input id="lg-u" class="input-militar" autocomplete="username"></div>
+<div class="f"><label>Senha</label><input id="lg-p" type="password" class="input-militar" autocomplete="current-password"></div>
+<div id="lg-err" style="color:#ff6666;font-size:.78rem;min-height:1.1rem;margin-bottom:.4rem"></div>
+<button type="submit" class="btn-login">Entrar no sistema</button></form></div>
+<div id="toast"></div>
+
+<script>
+// ═══ DADOS E ESTADO ═══
+const PATENTES=["GEN-FED","GEN-ADJ","CEL-GEN","TEN-GEN","MAJ-GEN","CEL","MAJ","CAP","TEN","SGT-MOR","SGT","SD","REC"];
+const FUNCOES=["1º CMD","2º CMD","Auxiliar","Efetivo","Instrutor","Comando Setorial"];
+const HORARIOS_GRADE=["11H","13H","15H","17H","19H"];
+const DIAS_SEMANA_NOMES=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+const TIPOS_ATIV=["Treinamento Geral","Treinamento Setorial","Ronda","Quebra de PVP","Blitz","Guarda de Portão","Guarda Voluntária","Evento de Drone","Outro"];
+const TIPOS_OFI=["Ofício","Memorando","Subida de patente","Licença / Afastamento","Outro"];
+const SETORES={SETOR_SUL:"Setor Sul",SETOR_NORTE:"Setor Norte",BPM1:"1° B.P.M",BOPE:"B.O.P.E",ROTA:"R.O.T.A"};
+const STATUS_LBL={ATIVO:"ATIVO",FERIAS:"FÉRIAS",LICENCA:"LICENÇA",MIA:"M.I.A"};
+const KEY="comando_militar_v2";
+
+let SETOR_ATUAL="SETOR_SUL";
+let MILITARES=[
+  {id:"1",nome:"Ronaldo Marques",rank:"MAJ-GEN",funcao:"2º CMD",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"2",nome:"Versidue Shaie",rank:"MAJ-GEN",funcao:"1º CMD",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"3",nome:"Moises Silvanjo",rank:"TEN",funcao:"Efetivo",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"4",nome:"Rafael Sul",rank:"TEN",funcao:"Auxiliar",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"5",nome:"Felipe Kamal",rank:"SGT-MOR",funcao:"Efetivo",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"6",nome:"Besarico Besarico",rank:"SGT",funcao:"Efetivo",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"7",nome:"Saturu Ss",rank:"SGT",funcao:"Efetivo",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"8",nome:"Alkuni Zabir",rank:"SD",funcao:"Efetivo",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null},
+  {id:"9",nome:"Eli Thakilas",rank:"SD",funcao:"Efetivo",status:"ATIVO",setor:"SETOR_SUL",feriasAte:null}
+];
+let RELATORIOS=[],OFICIOS=[],EVENTOS_DOSSIE=[],GRADE_PRESENCA={},BLACKLIST=[];
+
+// ═══ UTILITÁRIOS ═══
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=(n,l=2)=>String(n).padStart(l,"0");
+const isoDe=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const hoje=()=>isoDe(new Date());
+const fmtD=s=>{if(!s)return"—";const [y,m,d]=String(s).slice(0,10).split("-");return d+"/"+m+"/"+y};
+const addDias=(iso,n)=>{const d=new Date(iso+"T12:00:00");d.setDate(d.getDate()+n);return isoDe(d)};
+const segunda=iso=>{const d=new Date(iso+"T12:00:00");return addDias(iso,-((d.getDay()+6)%7))};
+const opts=(a,sel)=>a.map(x=>`<option ${x===sel?"selected":""}>${esc(x)}</option>`).join("");
+const campo=(l,h)=>`<div class="f"><label>${l}</label>${h}</div>`;
+const mil=id=>MILITARES.find(m=>m.id===id);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const militaresSetor=()=>MILITARES.filter(m=>m.setor===SETOR_ATUAL).sort((a,b)=>PATENTES.indexOf(b.rank)*-1-(PATENTES.indexOf(a.rank)*-1)||a.nome.localeCompare(b.nome));
+const autorAtual=()=>{const m=militaresSetor().find(x=>x.funcao==="1º CMD")||militaresSetor().find(x=>x.funcao==="2º CMD");return m?m.nome:"Comando"};
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";clearTimeout(toast._t);toast._t=setTimeout(()=>e.style.display="none",2800)}
+function salvar(){try{localStorage.setItem(KEY,JSON.stringify({MILITARES,RELATORIOS,OFICIOS,EVENTOS_DOSSIE,GRADE_PRESENCA,BLACKLIST,SETOR_ATUAL}))}catch(e){toast("Não foi possível salvar (armazenamento cheio).")}}
+function carregarStorage(){try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(!d)return;MILITARES=d.MILITARES||MILITARES;RELATORIOS=d.RELATORIOS||[];OFICIOS=d.OFICIOS||[];EVENTOS_DOSSIE=d.EVENTOS_DOSSIE||[];GRADE_PRESENCA=d.GRADE_PRESENCA||{};BLACKLIST=d.BLACKLIST||[];SETOR_ATUAL=d.SETOR_ATUAL||SETOR_ATUAL}catch(e){}}
+function ev(milId,tipo,titulo,texto){EVENTOS_DOSSIE.push({id:uid(),milId,tipo,titulo,texto:texto||"",data:hoje(),ts:Date.now(),autor:autorAtual()})}
+function expirarAfastamentos(){let mudou=false;MILITARES.forEach(m=>{if((m.status==="FERIAS"||m.status==="LICENCA")&&m.feriasAte&&m.feriasAte<hoje()){m.status="ATIVO";m.feriasAte=null;ev(m.id,"retorno","Retorno automático ao serviço");mudou=true}});if(mudou)salvar()}
+
+// ═══ MODAL E DOCUMENTO ═══
+function abrirModal(t,body,btns){$("modal-title").textContent=t;$("modal-body").innerHTML=body;const f=$("modal-footer");f.innerHTML="";(btns||[{label:"Fechar"}]).forEach(b=>{const x=document.createElement("button");x.className="btn "+(b.cls||"");x.textContent=b.label;x.onclick=async()=>{if(b.fn){const r=await b.fn();if(r===false)return}fecharModal()};f.appendChild(x)});$("modal-container").classList.add("open")}
+function fecharModal(){$("modal-container").classList.remove("open")}
+const OK=(label,fn,cls)=>[{label:"Cancelar"},{label,fn,cls:cls||"btn-primary"}];
+function abrirDoc(html){$("doc-paper-content").innerHTML=html;$("doc-view-overlay").classList.add("open");$("doc-view-overlay").scrollTop=0}
+function fecharDocViewer(){$("doc-view-overlay").classList.remove("open")}
+const docTopo=(sub)=>`<div class="doc-top"><div style="font-weight:700;letter-spacing:.06em">EXÉRCITO MILITAR DE YUBA</div><div style="font-weight:700">${esc((SETORES[SETOR_ATUAL]||"").toUpperCase())}</div><div style="font-size:11px;color:#555">${esc(sub)}</div></div>`;
+const docAssinatura=(autor)=>`<div class="doc-signature-box"><div class="doc-sign-hand">${esc(autor)}</div><div class="doc-sign-role">${esc(autor.toUpperCase())}<br>COMANDANTE — ${esc((SETORES[SETOR_ATUAL]||"").toUpperCase())}</div></div><div class="doc-stamp-red">${esc(autor)}<br>${esc(SETORES[SETOR_ATUAL]||"")}<br>Assinado digitalmente</div>`;
+
+// ═══ NAVEGAÇÃO ═══
+function navTo(v){document.querySelectorAll(".view-section").forEach(s=>s.classList.remove("active"));$("view-"+v).classList.add("active");document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.v===v));window.scrollTo(0,0);renderTudo()}
+function trocarSetor(v){SETOR_ATUAL=v;salvar();renderTudo()}
+function popularFiltros(){$("filtro-patente").innerHTML='<option value="">Todas Patentes</option>'+PATENTES.map(p=>`<option>${p}</option>`).join("");$("setor-select").value=SETOR_ATUAL}
+function renderTudo(){renderUsuarios();renderLog();renderSetores();expirarAfastamentos();renderDashboard();renderEfetivo();renderRelatorios();renderOficios();renderGradeSelect();renderGradeSemanal();renderDiscord()}
+
+// ═══ DASHBOARD ═══
+function renderAcao(){const c=addDias(hoje(),-7),L=EVENTOS_DOSSIE.filter(e=>e.tipo==="promocao"&&e.data>=c&&mil(e.milId)&&mil(e.milId).setor===SETOR_ATUAL);$("dash-acao").innerHTML=L.length?L.map(e=>`<div style="padding:.5rem 0;border-bottom:1px solid var(--border)"><b>${esc(mil(e.milId).nome)}</b> <span style="color:var(--green)">${esc(e.titulo)}</span><small style="display:block;color:var(--text-muted)">Registrado por ${esc(e.autor)}</small></div>`).join(""):'<span style="color:var(--text-muted)">Nenhuma pendência de fardamento.</span>'}
+function renderUsuarios(){$("tbody-usuarios").innerHTML=MILITARES.filter(m=>["1º CMD","2º CMD","Comando Setorial"].includes(m.funcao)).map(m=>`<tr><td><b>${esc(m.nome)}</b></td><td>${m.funcao==="1º CMD"?"Administrador":"Comando"}</td><td>${esc(SETORES[m.setor]||m.setor)}</td></tr>`).join("")||'<tr><td colspan="3">Nenhum usuário</td></tr>'}
+function renderLog(){$("tbody-log").innerHTML=EVENTOS_DOSSIE.slice().sort((a,b)=>b.ts-a.ts).slice(0,200).map(e=>{const m=mil(e.milId);return `<tr><td>${fmtD(e.data)}</td><td>${esc(m?m.nome:"—")}</td><td>${esc(e.titulo)}</td><td>${esc(e.texto)}</td><td>${esc(e.autor)}</td></tr>`}).join("")||'<tr><td colspan="5">Sem registros</td></tr>'}
+function renderSetores(){$("tbody-setores").innerHTML=Object.entries(SETORES).map(([k,v])=>{const l=MILITARES.filter(m=>m.setor===k);return `<tr><td><b>${esc(v)}</b></td><td>${l.length}</td><td>${l.filter(m=>m.status==="ATIVO").length}</td><td>${RELATORIOS.filter(r=>r.setor===k).length}</td></tr>`}).join("")}
+const b64=t=>btoa(unescape(encodeURIComponent(t)));
+function checarSessao(){let ok=false;try{ok=sessionStorage.getItem("cm_sess")==="1"}catch(e){}$("login-overlay").style.display=ok?"none":"flex"}
+function entrar(e){e.preventDefault();const u=$("lg-u").value.trim().toLowerCase(),p=$("lg-p").value,er=$("lg-err");if(!u||!p){er.textContent="Informe usuário e senha.";return false}let c=null;try{c=JSON.parse(localStorage.getItem("cm_usr")||"null")}catch(x){}
+ if(!c){try{localStorage.setItem("cm_usr",JSON.stringify({u,p:b64(p)}))}catch(x){}toast("Primeiro acesso: conta criada.")}else if(c.u!==u||c.p!==b64(p)){er.textContent="Usuário ou senha inválidos.";return false}
+ try{sessionStorage.setItem("cm_sess","1")}catch(x){}er.textContent="";$("lg-p").value="";checarSessao();return false}
+function sair(){abrirModal("Sair","<p>Encerrar a sessão?</p>",OK("Sair",()=>{try{sessionStorage.removeItem("cm_sess")}catch(x){}checarSessao()}))}
+function renderDashboard(){renderAcao();const l=militaresSetor(),corte=addDias(hoje(),-7);$("stat-total").textContent=l.length;$("stat-ativos").textContent=l.filter(m=>m.status==="ATIVO").length;$("stat-ferias").textContent=l.filter(m=>m.status==="FERIAS").length;$("stat-atividades").textContent=RELATORIOS.filter(r=>r.setor===SETOR_ATUAL&&r.data>=corte).length;$("dash-info-date").textContent=new Date().toLocaleDateString("pt-BR")+" — "+(SETORES[SETOR_ATUAL]||"")}
+
+// ═══ EFETIVO ═══
+function renderEfetivo(){
+  const q=($("filtro-nome").value||"").toLowerCase(),st=$("filtro-status").value,pt=$("filtro-patente").value;
+  const l=militaresSetor().filter(m=>(!q||m.nome.toLowerCase().includes(q))&&(!st||m.status===st)&&(!pt||m.rank===pt));
+  const itens=m=>[["dossie","Dossiê"],["editar","Editar Dados"],["transferir","Transferir Setor"],["funcao","Alterar Função"],["promover","Promover"],["rebaixar","Rebaixar"],["conduta","Registrar Conduta"],["ferias","Conceder Férias"],["licenca","Licenciar"],["mia","Declarar M.I.A"],["oficio","Redigir Ofício"]].concat(m.status!=="ATIVO"?[["retornar","Encerrar Afastamento"]]:[]).concat([["blacklist","Black List"],["excluir","Excluir Registro"]]);
+  $("tbody-efetivo").innerHTML=l.length?l.map(m=>`<tr><td><a href="#" style="color:#fff;font-weight:700;text-decoration:none" onclick="abrirDossie('${m.id}');return false">${esc(m.nome)}</a></td><td>${esc(m.rank)}</td><td>${esc(m.funcao)}</td><td><span class="badge-status st-${m.status.toLowerCase()}">${STATUS_LBL[m.status]}</span></td><td>${esc(SETORES[m.setor]||m.setor)}</td><td style="text-align:right"><div class="action-dropdown"><button class="btn btn-sm" onclick="toggleMenu(event)" aria-label="Ações">⋮</button><div class="dropdown-menu">${itens(m).map(([k,t])=>`<button class="dropdown-item ${k==="excluir"?"danger":""}" onclick="acao('${k}','${m.id}')">${t}</button>`).join("")}</div></div></td></tr>`).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum militar encontrado</td></tr>`;
+}
+const filtrarTabelaEfetivo=renderEfetivo;
+function limparFiltrosEfetivo(){$("filtro-nome").value="";$("filtro-status").value="";$("filtro-patente").value="";renderEfetivo()}
+function toggleMenu(e){e.stopPropagation();const w=e.currentTarget.parentElement,abrir=!w.classList.contains("open");document.querySelectorAll(".action-dropdown.open").forEach(x=>x.classList.remove("open"));if(!abrir)return;w.classList.add("open");const mn=w.querySelector(".dropdown-menu"),r=e.currentTarget.getBoundingClientRect();mn.style.position="fixed";mn.style.left=Math.max(8,r.right-mn.offsetWidth)+"px";mn.style.top=Math.max(8,Math.min(r.bottom+4,innerHeight-mn.offsetHeight-8))+"px"}
+document.addEventListener("click",()=>document.querySelectorAll(".action-dropdown.open").forEach(x=>x.classList.remove("open")));
+
+function abrirModalNovoMilitar(){abrirModal("Novo Militar",campo("Nome",'<input id="n-nome" class="input-militar">')+campo("Patente",`<select id="n-rank" class="input-militar">${opts(PATENTES,"REC")}</select>`)+campo("Função",`<select id="n-fn" class="input-militar">${opts(FUNCOES,"Efetivo")}</select>`),OK("Adicionar",()=>{const n=$("n-nome").value.trim();if(!n){toast("Informe o nome.");return false}const m={id:uid(),nome:n,rank:$("n-rank").value,funcao:$("n-fn").value,status:"ATIVO",setor:SETOR_ATUAL,feriasAte:null};MILITARES.push(m);ev(m.id,"cadastro","Ingresso no efetivo",m.rank);salvar();renderTudo();toast("Militar adicionado.")}))}
+function mover(m,rk,tipo,motivo){const de=m.rank;m.rank=rk;ev(m.id,tipo,(tipo==="promocao"?"Promoção: ":"Rebaixamento: ")+de+" → "+rk,motivo);salvar();renderTudo();toast(m.nome+" agora é "+rk)}
+function acao(k,id){const m=mil(id);if(!m)return;
+  const A={
+    dossie:()=>abrirDossie(id),
+    editar:()=>abrirModal("Editar Dados",campo("Nome",`<input id="e-nome" class="input-militar" value="${esc(m.nome)}">`)+campo("Cargo / Patente",`<select id="e-rank" class="input-militar">${opts(PATENTES,m.rank)}</select>`)+campo("Função",`<select id="e-fn" class="input-militar">${opts(FUNCOES,m.funcao)}</select>`),OK("Salvar alterações",()=>{const n=$("e-nome").value.trim();if(!n){toast("Informe o nome.");return false}m.nome=n;m.rank=$("e-rank").value;m.funcao=$("e-fn").value;ev(id,"edicao","Dados editados");salvar();renderTudo()})),
+    transferir:()=>abrirModal("Transferir Setor",campo("Novo setor",`<select id="t-set" class="input-militar">${Object.entries(SETORES).map(([k,v])=>`<option value="${k}" ${k===m.setor?"selected":""}>${v}</option>`).join("")}</select>`),OK("Transferir",()=>{const s=$("t-set").value;if(s===m.setor){toast("Escolha outro setor.");return false}m.setor=s;ev(id,"transferencia","Transferido para "+SETORES[s]);salvar();renderTudo();toast("Transferido.")})),
+    funcao:()=>abrirModal("Alterar Função",campo("Função",`<select id="f-fn" class="input-militar">${opts(FUNCOES,m.funcao)}</select>`),OK("Salvar",()=>{m.funcao=$("f-fn").value;ev(id,"funcao","Função alterada",m.funcao);salvar();renderTudo()})),
+    promover:()=>abrirModal("Promover — "+m.nome,`<p style="margin-bottom:.8rem">Patente atual: <b>${esc(m.rank)}</b></p>`+campo("Nova patente",`<select id="p-rk" class="input-militar">${opts(PATENTES,PATENTES[Math.max(0,PATENTES.indexOf(m.rank)-1)])}</select>`),OK("Promover",()=>{const r=$("p-rk").value;if(r===m.rank){toast("Escolha outra patente.");return false}mover(m,r,"promocao")})),
+    rebaixar:()=>abrirModal("Rebaixar — "+m.nome,`<p style="margin-bottom:.8rem">Patente atual: <b>${esc(m.rank)}</b></p>`+campo("Nova patente",`<select id="p-rk" class="input-militar">${opts(PATENTES,PATENTES[Math.min(PATENTES.length-1,PATENTES.indexOf(m.rank)+1)])}</select>`)+campo("Motivo *",'<textarea id="p-mot" class="input-militar"></textarea>'),OK("Rebaixar",()=>{const r=$("p-rk").value,mt=$("p-mot").value.trim();if(r===m.rank||!mt){toast("Escolha outra patente e informe o motivo.");return false}mover(m,r,"rebaixamento",mt)},"btn-danger")),
+    conduta:()=>abrirModal("Registrar Conduta — "+m.nome,campo("Tipo",`<select id="c-tp" class="input-militar">${opts(["Elogio","Advertência","Suspensão","Observação"])}</select>`)+campo("Descrição *",'<textarea id="c-tx" class="input-militar"></textarea>'),OK("Registrar",()=>{const t=$("c-tx").value.trim();if(!t){toast("Descreva a conduta.");return false}ev(id,"conduta","Conduta: "+$("c-tp").value,t);salvar();toast("Conduta registrada no dossiê.")})),
+    ferias:()=>abrirModal("Conceder Férias — "+m.nome,campo("Data de início",`<input type="date" id="v-ini" class="input-militar" value="${hoje()}">`)+campo("Quantidade de dias",'<input type="number" id="v-dias" class="input-militar" min="1" value="7">'),OK("Conceder",()=>{const i=$("v-ini").value,d=+$("v-dias").value;if(!i||d<1){toast("Informe início e dias.");return false}m.status="FERIAS";m.feriasAte=addDias(i,d-1);ev(id,"ferias","Férias concedidas",fmtD(i)+" a "+fmtD(m.feriasAte)+" ("+d+" dias)");salvar();renderTudo()})),
+    licenca:()=>abrirModal("Licenciar — "+m.nome,campo("Motivo *",'<textarea id="l-mot" class="input-militar"></textarea>')+campo("Dias",'<input type="number" id="l-dias" class="input-militar" min="1" value="7">'),OK("Licenciar",()=>{const mt=$("l-mot").value.trim(),d=+$("l-dias").value;if(!mt||d<1){toast("Informe motivo e dias.");return false}m.status="LICENCA";m.feriasAte=addDias(hoje(),d-1);ev(id,"licenca","Licença concedida",mt+" — até "+fmtD(m.feriasAte));salvar();renderTudo()})),
+    mia:()=>abrirModal("Declarar M.I.A — "+m.nome,campo("Motivo / última informação *",'<textarea id="m-mot" class="input-militar"></textarea>'),OK("Declarar",()=>{const mt=$("m-mot").value.trim();if(!mt){toast("Informe o motivo.");return false}m.status="MIA";m.feriasAte=null;ev(id,"mia","Declarado M.I.A",mt);salvar();renderTudo()},"btn-danger")),
+    retornar:()=>{m.status="ATIVO";m.feriasAte=null;ev(id,"retorno","Retorno ao serviço ativo");salvar();renderTudo();toast("Voltou ao serviço.")},
+    oficio:()=>abrirNovoOficio(id),
+    blacklist:()=>abrirModal("Black List — "+m.nome,'<p style="margin-bottom:.8rem">O militar sai do efetivo e fica registrado na blacklist.</p>'+campo("Motivo *",'<textarea id="b-mot" class="input-militar"></textarea>'),OK("Confirmar",()=>{const mt=$("b-mot").value.trim();if(!mt){toast("Informe o motivo.");return false}BLACKLIST.push({...m,motivo:mt,data:hoje()});MILITARES=MILITARES.filter(x=>x.id!==id);salvar();renderTudo();toast("Adicionado à blacklist.")},"btn-danger")),
+    excluir:()=>abrirModal("Excluir Registro",`<p>Excluir <b>${esc(m.nome)}</b> do sistema? Esta ação não pode ser desfeita.</p>`,OK("Excluir",()=>{MILITARES=MILITARES.filter(x=>x.id!==id);salvar();renderTudo()},"btn-danger"))
+  };
+  A[k]&&A[k]();
+}
+
+// ═══ DOSSIÊ ═══
+function fichaPresenca(id){const f={P:0,F:0,J:0,N:0};Object.values(GRADE_PRESENCA).forEach(d=>{const x=d&&d[id];if(x)Object.values(x).forEach(v=>{if(f[v]!=null)f[v]++})});return f}
+const EV_ICON={atividade:"🎯",conduta:"⚖️",promocao:"⬆️",rebaixamento:"⬇️",ferias:"🏖️",licenca:"📄",mia:"⚠️",oficio:"✉️",retorno:"✅",transferencia:"↔️",funcao:"🧭",edicao:"✏️",cadastro:"🆕"};
+function abrirDossie(id){const m=mil(id);if(!m)return;const evs=EVENTOS_DOSSIE.filter(e=>e.milId===id).sort((a,b)=>b.ts-a.ts),f=fichaPresenca(id),nAt=evs.filter(e=>e.tipo==="atividade").length,tot=f.P+f.F;
+  abrirModal("Dossiê — "+m.nome,`<div style="color:var(--text-muted);font-size:.82rem">${esc(m.rank)} · ${esc(m.funcao)} · ${esc(SETORES[m.setor]||"")} · <span class="badge-status st-${m.status.toLowerCase()}">${STATUS_LBL[m.status]}</span></div><div class="dos-grid"><div><b>${nAt}</b>Atividades</div><div><b>${tot?Math.round(f.P/tot*100)+"%":"—"}</b>Assiduidade</div><div><b>${f.P}</b>Presenças</div><div><b>${f.F}</b>Faltas</div><div><b>${f.J}</b>Justificativas</div><div><b>${f.N}</b>Novato</div></div><div style="font-family:var(--font-display);color:var(--accent);margin:.6rem 0">LINHA DO TEMPO (DOSSIÊ)</div>${evs.length?evs.map(e=>`<div class="dos-ev"><div class="d">${fmtD(e.data)}</div><div><b>${EV_ICON[e.tipo]||"•"} ${esc(e.titulo)}</b>${e.texto?`<small>${esc(e.texto)}</small>`:""}<small>por ${esc(e.autor)}</small></div></div>`).join(""):'<p style="color:var(--text-muted)">Sem registros ainda.</p>'}`)}
+
+// ═══ RELATÓRIOS DE ATIVIDADE ═══
+let _imgs=[];
+function comprimirImg(file){return new Promise(res=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=im.width*k;c.height=im.height*k;c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.6))};im.onerror=()=>res(null);im.src=fr.result};fr.onerror=()=>res(null);fr.readAsDataURL(file)})}
+function renderRelatorios(){const l=RELATORIOS.filter(r=>r.setor===SETOR_ATUAL).sort((a,b)=>b.ts-a.ts);$("tbody-relatorios").innerHTML=l.length?l.map(r=>`<tr><td><b>Nº ${esc(r.num)}</b></td><td>${fmtD(r.data)}</td><td>${esc(r.tipo)}</td><td>${esc(r.titulo)}</td><td>${esc(r.autor)}</td><td style="text-align:right"><button class="btn btn-sm" onclick="verRelatorio('${r.id}')">Ver / PDF</button> <button class="btn btn-sm btn-danger" onclick="excluirRelatorio('${r.id}')">Excluir</button></td></tr>`).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum relatório</td></tr>`}
+function abrirNovoRelatorio(){_imgs=[];const ps=militaresSetor().map(m=>`<label><input type="checkbox" class="rl-p" value="${m.id}"> ${esc(m.rank)} ${esc(m.nome)}</label>`).join("");
+  abrirModal("Emitir Novo Relatório",campo("Data da atividade",`<input type="date" id="rl-data" class="input-militar" value="${hoje()}">`)+campo("Tipo de atividade",`<select id="rl-tipo" class="input-militar">${opts(TIPOS_ATIV)}</select>`)+campo("Título do relatório",'<input id="rl-tit" class="input-militar" placeholder="Ex: Operação de Retomada Territorial">')+campo("Efetivo participante",`<div class="chk-list">${ps||"Sem efetivo neste setor"}</div>`)+campo("Assistente de síntese",'<textarea id="rl-ia" class="input-militar" placeholder="Ex: Patrulha no setor sul, 2 abordagens, sem novidades..."></textarea><button type="button" class="btn btn-sm btn-gold" style="margin-top:.4rem" onclick="gerarTextoRel()">Gerar texto</button>')+campo("Descrição da atividade",'<textarea id="rl-desc" class="input-militar" placeholder="Escreva o corpo do documento aqui ou use o assistente acima..."></textarea>')+campo("Resultado (opcional)",'<textarea id="rl-res" class="input-militar"></textarea>')+campo("Dados adicionais (opcional)",'<input id="rl-dad" class="input-militar">')+campo("Anexar imagens (evidências, até 4)",'<input type="file" id="rl-img" class="input-militar" accept="image/*" multiple onchange="addImgs(this)"><div class="prev-imgs" id="rl-prev"></div>'),
+  OK("Emitir Relatório",()=>{const ids=[...document.querySelectorAll(".rl-p:checked")].map(c=>c.value),data=$("rl-data").value;if(!data||!ids.length){toast("Informe a data e marque ao menos um participante.");return false}
+    const ano=data.slice(0,4),seq=Math.max(0,...RELATORIOS.filter(r=>r.setor===SETOR_ATUAL&&r.ano===ano).map(r=>r.seq))+1,tipo=$("rl-tipo").value;
+    const r={id:uid(),seq,ano,num:pad(seq,3)+"/"+ano,data,tipo,titulo:$("rl-tit").value.trim()||tipo,parts:ids.map(i=>({id:i,nome:mil(i).nome,rank:mil(i).rank})),desc:$("rl-desc").value.trim(),res:$("rl-res").value.trim(),dados:$("rl-dad").value.trim(),imgs:_imgs,autor:autorAtual(),setor:SETOR_ATUAL,ts:Date.now()};
+    RELATORIOS.push(r);ids.forEach(i=>{EVENTOS_DOSSIE.push({id:uid(),milId:i,tipo:"atividade",titulo:"Participação: "+tipo,texto:"Nº "+r.num+" — "+r.titulo,relId:r.id,data,ts:Date.now(),autor:r.autor})});salvar();renderTudo();toast("Relatório Nº "+r.num+" emitido.")}))}
+async function addImgs(inp){for(const f of [...inp.files]){if(_imgs.length>=4)break;const d=await comprimirImg(f);if(d)_imgs.push(d)}$("rl-prev").innerHTML=_imgs.map(s=>`<img src="${s}">`).join("");inp.value=""}
+function gerarTextoRel(){const r=$("rl-ia").value.trim();if(!r){toast("Escreva um resumo rápido primeiro.");return}const nomes=[...document.querySelectorAll(".rl-p:checked")].map(c=>mil(c.value).nome),t=$("rl-tit").value.trim();$("rl-desc").value=`Em ${fmtD($("rl-data").value)}, foi realizada atividade do tipo ${$("rl-tipo").value}${t?` ("${t}")`:""}${nomes.length?`, com a participação de ${nomes.join(", ")}`:""}. Síntese: ${r.replace(/\.$/,"")}. A atividade foi concluída e este relatório registra a execução para fins de controle do comando.`}
+function verRelatorio(id){const r=RELATORIOS.find(x=>x.id===id);if(!r)return;abrirDoc(`${docTopo("RELATÓRIO DE EXECUÇÃO // USO OFICIAL")}<div class="doc-title">RELATÓRIO DE ${esc(r.tipo.toUpperCase())} Nº ${esc(r.num)}</div><table class="meta"><tr><td><b>Origem:</b> Comando — ${esc(SETORES[r.setor])}</td><td><b>Data:</b> ${fmtD(r.data)}</td></tr><tr><td><b>Autor:</b> ${esc(r.autor)}</td><td><b>Título:</b> ${esc(r.titulo)}</td></tr></table><h4>1. Síntese da atividade</h4><p>${esc(r.desc||"—").replace(/\n/g,"<br>")}</p><h4>2. Efetivo participante</h4><ul style="margin-left:1.2rem">${r.parts.map(p=>`<li>${esc(p.rank)} ${esc(p.nome)}</li>`).join("")}</ul><h4>3. Resultado</h4><p>${esc(r.res||"—").replace(/\n/g,"<br>")}</p><h4>4. Dados adicionais</h4><p>${esc(r.dados||"—")}</p>${docAssinatura(r.autor)}${r.imgs.length?`<div class="annex"><h4>5. Evidências visuais (anexos do relatório Nº ${esc(r.num)})</h4>${r.imgs.map(s=>`<img src="${s}">`).join("")}</div>`:""}`)}
+function excluirRelatorio(id){const r=RELATORIOS.find(x=>x.id===id);if(!r)return;abrirModal("Excluir relatório",`<p>Excluir o relatório Nº ${esc(r.num)}?</p>`,OK("Excluir",()=>{RELATORIOS=RELATORIOS.filter(x=>x.id!==id);EVENTOS_DOSSIE=EVENTOS_DOSSIE.filter(e=>e.relId!==id);salvar();renderTudo()},"btn-danger"))}
+function gerarConsolidado(){abrirModal("Relatório Consolidado",campo("De",`<input type="date" id="rc-a" class="input-militar" value="${addDias(hoje(),-7)}">`)+campo("Até",`<input type="date" id="rc-b" class="input-militar" value="${hoje()}">`),OK("Gerar",()=>{const a=$("rc-a").value,b=$("rc-b").value,L=RELATORIOS.filter(r=>r.setor===SETOR_ATUAL&&r.data>=a&&r.data<=b).sort((x,y)=>x.data.localeCompare(y.data)),pt={},pm={};L.forEach(r=>{pt[r.tipo]=(pt[r.tipo]||0)+1;r.parts.forEach(p=>{pm[p.nome]=(pm[p.nome]||0)+1})});
+  abrirDoc(`${docTopo("RELATÓRIO CONSOLIDADO DE ATIVIDADES")}<div class="doc-title">PERÍODO ${fmtD(a)} A ${fmtD(b)}</div><p><b>Total de atividades:</b> ${L.length}</p><h4>Por tipo</h4><ul style="margin-left:1.2rem">${Object.entries(pt).map(([k,v])=>`<li>${esc(k)}: ${v}</li>`).join("")||"<li>—</li>"}</ul><h4>Participação por militar</h4><ul style="margin-left:1.2rem">${Object.entries(pm).sort((x,y)=>y[1]-x[1]).map(([k,v])=>`<li>${esc(k)}: ${v}</li>`).join("")||"<li>—</li>"}</ul><h4>Relatórios do período</h4><table class="lista"><tr><th>Nº</th><th>Data</th><th>Tipo</th><th>Título</th><th>Autor</th></tr>${L.map(r=>`<tr><td>${esc(r.num)}</td><td>${fmtD(r.data)}</td><td>${esc(r.tipo)}</td><td>${esc(r.titulo)}</td><td>${esc(r.autor)}</td></tr>`).join("")}</table>${docAssinatura(autorAtual())}`)}))}
+
+// ═══ OFÍCIOS ═══
+function renderOficios(){const l=OFICIOS.filter(o=>o.setor===SETOR_ATUAL).sort((a,b)=>b.ts-a.ts);$("tbody-oficios").innerHTML=l.length?l.map(o=>`<tr><td><b>Nº ${esc(o.num)}</b></td><td>${fmtD(o.data)}</td><td>${esc(o.tipo)}</td><td>${esc(o.assunto)}</td><td>${esc(o.milNome||"—")}</td><td style="text-align:right"><button class="btn btn-sm" onclick="verOficio('${o.id}')">Ver / PDF</button> <button class="btn btn-sm btn-danger" onclick="excluirOficio('${o.id}')">Excluir</button></td></tr>`).join(""):`<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum ofício</td></tr>`}
+function abrirNovoOficio(milId){abrirModal("Redigir Ofício",campo("Tipo",`<select id="of-tipo" class="input-militar">${opts(TIPOS_OFI)}</select>`)+campo("Data",`<input type="date" id="of-data" class="input-militar" value="${hoje()}">`)+campo("Para",'<input id="of-para" class="input-militar" value="Alto Comando de Yuba">')+campo("Assunto *",'<input id="of-ass" class="input-militar" placeholder="Ex: Subida de patente">')+campo("Militar referente (opcional)",`<select id="of-mil" class="input-militar"><option value="">—</option>${militaresSetor().map(m=>`<option value="${m.id}" ${m.id===milId?"selected":""}>${esc(m.rank)} ${esc(m.nome)}</option>`).join("")}</select>`)+campo("Corpo do documento *",'<textarea id="of-corpo" class="input-militar" style="min-height:130px" placeholder="Solicito formalmente..."></textarea>'),
+  OK("Registrar",()=>{const ass=$("of-ass").value.trim(),corpo=$("of-corpo").value.trim(),data=$("of-data").value;if(!ass||!corpo||!data){toast("Preencha data, assunto e corpo.");return false}const ano=data.slice(0,4),seq=Math.max(0,...OFICIOS.filter(o=>o.setor===SETOR_ATUAL&&o.ano===ano).map(o=>o.seq))+1,mid=$("of-mil").value,m=mil(mid);
+    OFICIOS.push({id:uid(),seq,ano,num:pad(seq,3)+"/"+ano,data,tipo:$("of-tipo").value,para:$("of-para").value.trim(),assunto:ass,corpo,milId:mid,milNome:m?m.rank+" "+m.nome:"",autor:autorAtual(),setor:SETOR_ATUAL,ts:Date.now()});if(m)ev(mid,"oficio","Ofício Nº "+pad(seq,3)+"/"+ano,ass);salvar();renderTudo();toast("Ofício registrado.")}))}
+function verOficio(id){const o=OFICIOS.find(x=>x.id===id);if(!o)return;abrirDoc(`${docTopo("OFÍCIOS E MEMORANDOS")}<table class="meta"><tr><td><b>OFÍCIO Nº:</b> ${esc(o.num)}</td><td><b>DATA:</b> ${fmtD(o.data)}</td></tr><tr><td><b>PARA:</b> ${esc(o.para)}</td><td><b>TIPO:</b> ${esc(o.tipo)}</td></tr><tr><td colspan="2"><b>ASSUNTO:</b> ${esc(o.assunto)}</td></tr>${o.milNome?`<tr><td colspan="2"><b>MILITAR:</b> ${esc(o.milNome)}</td></tr>`:""}</table><p style="text-indent:2rem;text-align:justify;margin:1.2rem 0">${esc(o.corpo).replace(/\n/g,"<br>")}</p>${docAssinatura(o.autor)}`)}
+function excluirOficio(id){abrirModal("Excluir ofício","<p>Excluir este ofício?</p>",OK("Excluir",()=>{OFICIOS=OFICIOS.filter(x=>x.id!==id);salvar();renderTudo()},"btn-danger"))}
+
+// ═══ GRADE DE PRESENÇA ═══
+const CICLO=["","P","F","J","N"];
+function renderGradeSelect(){const s=$("grade-militar-select"),l=militaresSetor(),cur=s.value;s.innerHTML='<option value="">Selecione o militar</option>'+l.map(m=>`<option value="${m.id}">${esc(m.rank)} ${esc(m.nome)}</option>`).join("");if(l.some(m=>m.id===cur))s.value=cur;if(!$("grade-data").value)$("grade-data").value=hoje()}
+function renderGradeSemanal(){const id=$("grade-militar-select").value,box=$("grade-box-container");if(!id){box.innerHTML='<p style="color:var(--text-muted);padding:1rem;text-align:center">Selecione um militar para ver a grade da semana.</p>';return}
+  const seg=segunda($("grade-data").value||hoje()),tot={P:0,F:0,J:0,N:0};
+  const rows=DIAS_SEMANA_NOMES.map((d,i)=>{const dt=addDias(seg,i);return `<tr><td><b>${d}</b><br><small style="color:var(--text-muted)">${fmtD(dt).slice(0,5)}</small></td>${HORARIOS_GRADE.map(h=>{const v=(GRADE_PRESENCA[dt]&&GRADE_PRESENCA[dt][id]&&GRADE_PRESENCA[dt][id][h])||"";if(tot[v]!=null)tot[v]++;return `<td><button class="grade-btn ${v}" onclick="cicloGrade('${dt}','${id}','${h}')">${v||"–"}</button></td>`}).join("")}</tr>`}).join("");
+  box.innerHTML=`<table class="table grade-table"><thead><tr><th>Dia</th>${HORARIOS_GRADE.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table><p style="padding:.8rem 1rem;font-size:.8rem;color:var(--text-muted)">Semana: <b>${tot.P}</b> presenças · <b>${tot.F}</b> faltas · <b>${tot.J}</b> justificadas · <b>${tot.N}</b> novato</p>`}
+function cicloGrade(dt,id,h){GRADE_PRESENCA[dt]=GRADE_PRESENCA[dt]||{};GRADE_PRESENCA[dt][id]=GRADE_PRESENCA[dt][id]||{};const nx=CICLO[(CICLO.indexOf(GRADE_PRESENCA[dt][id][h]||"")+1)%CICLO.length];if(nx)GRADE_PRESENCA[dt][id][h]=nx;else delete GRADE_PRESENCA[dt][id][h];salvar();renderGradeSemanal();renderDiscord()}
+function abrirChamadaHorario(){const l=militaresSetor();abrirModal("Chamada por Horário",campo("Data",`<input type="date" id="ch-d" class="input-militar" value="${hoje()}">`)+campo("Horário",`<select id="ch-h" class="input-militar">${opts(HORARIOS_GRADE)}</select>`)+campo('Presentes <button type="button" class="btn btn-sm" style="margin-left:.5rem" onclick="document.querySelectorAll(\'.ch-p:not(:disabled)\').forEach(c=>c.checked=true)">Marcar todos</button>',`<div class="chk-list">${l.map(m=>`<label><input type="checkbox" class="ch-p" value="${m.id}" ${m.status!=="ATIVO"?"disabled":""}> ${esc(m.rank)} ${esc(m.nome)}${m.status!=="ATIVO"?` <small>(${STATUS_LBL[m.status]} → J)</small>`:""}</label>`).join("")}</div>`)+'<small style="color:var(--text-muted)">Desmarcados viram F (falta); afastados viram J (justificado).</small>',
+  OK("Lançar chamada",()=>{const d=$("ch-d").value,h=$("ch-h").value;if(!d){toast("Informe a data.");return false}const on=new Set([...document.querySelectorAll(".ch-p:checked")].map(c=>c.value));GRADE_PRESENCA[d]=GRADE_PRESENCA[d]||{};l.forEach(m=>{GRADE_PRESENCA[d][m.id]=GRADE_PRESENCA[d][m.id]||{};GRADE_PRESENCA[d][m.id][h]=on.has(m.id)?"P":(m.status!=="ATIVO"?"J":"F")});salvar();renderTudo();toast("Chamada das "+h+" lançada ("+on.size+" presentes).")}))}
+
+// ═══ PRESENÇA (DISCORD) ═══
+function textoDiscord(){const d=hoje(),l=militaresSetor(),ic={ATIVO:"🟢",FERIAS:"🏖️",LICENCA:"📄",MIA:"⚠️"};return `📋 **LISTA DE PRESENÇA — ${(SETORES[SETOR_ATUAL]||"").toUpperCase()}**\n📅 ${fmtD(d)}\n\n`+l.map(m=>{const g=(GRADE_PRESENCA[d]&&GRADE_PRESENCA[d][m.id])||{},p=Object.values(g).filter(v=>v==="P").length;return `${ic[m.status]} ${m.rank} ${m.nome}${p?` — ${p} presença(s) hoje`:""}`}).join("\n")}
+function renderDiscord(){$("discord-preview-box").textContent=textoDiscord()}
+function copiarPresencaDiscord(){const t=textoDiscord();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Copiado para o Discord.")).catch(()=>{const a=document.createElement("textarea");a.value=t;document.body.appendChild(a);a.select();try{document.execCommand("copy");toast("Copiado para o Discord.")}catch(e){toast("Não foi possível copiar.")}a.remove()})}
+
+// ═══ INICIALIZAÇÃO ═══
+window.addEventListener("DOMContentLoaded",()=>{carregarStorage();popularFiltros();renderTudo();checarSessao()});
+</script>
+</body>
+</html>
