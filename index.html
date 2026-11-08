@@ -3,12 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
 <title>Comando Militar — Gestão de Efetivo & Atividades</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050505;--bg2:#0d0d0d;--bg3:#151515;--panel:rgba(14,14,14,.96);--border:rgba(242,217,78,.12);--border-focus:#f2d94e;--accent:#f2d94e;--accent-glow:rgba(242,217,78,.25);--gold:#f2d94e;--green:#00f070;--red:#f03030;--text:#ececec;--text-muted:#8a8a80;--r:8px;--font-display:'Rajdhani',sans-serif;--font-mono:'JetBrains Mono',monospace}
+:root{color-scheme:dark;--bg:#050505;--bg2:#0d0d0d;--bg3:#151515;--panel:rgba(14,14,14,.96);--border:rgba(242,217,78,.12);--border-focus:#f2d94e;--accent:#f2d94e;--accent-glow:rgba(242,217,78,.25);--gold:#f2d94e;--green:#00f070;--red:#f03030;--text:#ececec;--text-muted:#8a8a80;--r:8px;--font-display:'Rajdhani',sans-serif;--font-mono:'JetBrains Mono',monospace}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(242,217,78,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(242,217,78,.02) 1px,transparent 1px);background-size:40px 40px}
@@ -24,7 +25,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .unit-select{background:var(--bg2);border:1px solid var(--border);color:var(--accent);padding:.35rem .65rem;border-radius:var(--r);font-family:var(--font-display);font-size:.8rem;font-weight:700;outline:none;cursor:pointer}
 .main-content{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:1.5rem 1rem}
 .view-section{display:none}.view-section.active{display:block;animation:fadeUp .25s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{transform:translateY(8px)}to{transform:translateY(0)}}
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:1.5rem;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .panel-head{padding:.85rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(242,217,78,.03);flex-wrap:wrap;gap:.5rem}
 .panel-title{font-family:var(--font-display);font-size:.95rem;font-weight:800;letter-spacing:.1em;color:var(--accent);text-transform:uppercase}
@@ -125,7 +126,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   .dos-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:480px){.action-dropdown.open .dropdown-menu{grid-template-columns:1fr}}
-#login-overlay{position:fixed;inset:0;z-index:2500;background:radial-gradient(circle at 50% 30%,#14120a,#000 70%);display:none;align-items:center;justify-content:center;padding:1rem}
+#login-overlay{position:fixed;inset:0;z-index:2500;background:radial-gradient(circle at 50% 30%,#14120a,#000 70%);display:flex;align-items:center;justify-content:center;padding:1rem}
 .login-card{width:min(380px,94vw);background:linear-gradient(145deg,#121212,#050505);border:1px solid var(--accent);border-radius:12px;padding:1.8rem 1.6rem;box-shadow:0 0 40px rgba(242,217,78,.12)}
 .login-card h1{font-family:var(--font-display);font-size:1.5rem;letter-spacing:.12em;color:var(--accent);text-align:center;text-transform:uppercase}
 .login-card .sub{text-align:center;font-size:.62rem;font-weight:800;letter-spacing:.14em;color:#fff;text-transform:uppercase;margin:.3rem 0 1.4rem}
@@ -172,4 +173,4 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .rhead .rtit{font-weight:600;color:#fff}
 .rchips{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.6rem;margin:.8rem 0 1rem}
 .rchip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:.55rem .75rem}
-.rchip small{display:block;font-family:var(--font-display);font-size:.62rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text-m
+.rchip small{display:block;font-family:var(--font-display);font-size:.62rem;font-weight:800;letter-spacing:.12em;tex
